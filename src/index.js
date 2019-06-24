@@ -1,12 +1,32 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import { render } from "react-dom";
+import { observable, action } from "mobx";
+import { observer } from "mobx-react";
+import DevTools from "mobx-react-devtools";
 
-ReactDOM.render(<App />, document.getElementById('root'));
+class AppState {
+  @observable timer = 0;
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+  constructor() {
+    setInterval(() => {
+      this.timer += 1;
+    }, 1000);
+  }
+
+  @action.bound
+  reset() {
+    this.timer = 0;
+  }
+}
+
+const TimerView = observer(({ appState }) => (
+  <button onClick={appState.reset}>Seconds passed: {appState.timer}</button>
+));
+
+render(
+  <div>
+    <TimerView appState={new AppState()} />
+    <DevTools />
+  </div>,
+  document.getElementById("root")
+);
